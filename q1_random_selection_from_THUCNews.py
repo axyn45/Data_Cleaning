@@ -1,12 +1,16 @@
-import imp
+# import imp
 import os
 import random
-import re
-import string
+# import re
+# import string
+# import openpyxl
+from openpyxl import Workbook
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 
-rootpath='F:/THUCNews/'
+rootpath='I:/THUCNews/'
 raw_data_true=[]
 raw_data_false=[]
+sheetpath='D:/Coding-Projects/Data_Cleaning_2022_Teddy_Cup_C/data_THUCNews.xlsx'
 
 def sub_obj(path):
     sub_obj=[]
@@ -31,7 +35,7 @@ if __name__=='__main__':
         subpath=rootpath+i+'/'
         sub_files.append(sub_obj(subpath))
     j=0
-    while(j<200):                                              #Total number of files
+    while(j<6000):                                              #Total number of files
         if (j+1)%10==0:
             print(j+1)
         folders_count=len(sub_class)
@@ -44,11 +48,18 @@ if __name__=='__main__':
             with open(rootpath+sub_class[class_op]+'/'+sub_files[class_op][file_op],'r',encoding='UTF-8') as text:
                 # raw_line=text.read()
                 raw_data_false.append(text.read().replace('\n','').replace('　','')+'\n')
-            contained.append(str(class_op)+str(file_op))
+            contained.append(str(class_op)+'/'+str(file_op))
             text.close()
             j+=1
 
-    with open('F:/THUCNews/collection_12k_false.txt','w',encoding='UTF-8') as data:
-        data.writelines(raw_data_false)
-    data.close()
+    wb=Workbook()
+    sheet=wb.active
+    for i in range(6000):
+        sheet.cell(row=i+1,column=1).value=ILLEGAL_CHARACTERS_RE.sub(r'',raw_data_false[i])
+        sheet.cell(row=i+1,column=2).value='false'
+    wb.save(sheetpath)
+
+    # with open('F:/THUCNews/collection_12k_false.txt','w',encoding='UTF-8') as data:
+    #     data.writelines(raw_data_false)
+    # data.close()
     
